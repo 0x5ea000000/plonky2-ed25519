@@ -10,13 +10,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-plonky2 = {git = "https://github.com/Electron-Labs/plonky2",  branch = "derive_bn254_from_ff"}
-plonky2_crypto = {git = "https://github.com/Electron-Labs/plonky2-crypto"}
-plonky2_sha512 = {git = "https://github.com/Electron-Labs/plonky2_sha512"}
-curve25519-dalek = { git = "https://github.com/Electron-Labs/curve25519-dalek"}
+plonky2 = { git = "https://github.com/0x5ea000000/plonky2" }
+plonky2_crypto = { git = "https://github.com/0x5ea000000/plonky2-crypto" }
+plonky2_sha512 = { git = "https://github.com/0x5ea000000/plonky2-sha512" }
+curve25519-dalek = { git = "https://github.com/0x5ea000000/curve25519-dalek" }
 itertools = { version = "0.11.0", default-features = false }
 num = { version = "0.4", default-features = false, features = ["rand"] }
-serde = { version = "1.0", default-features = false, features = ["derive", "rc"] }
+serde = { version = "1.0", default-features = false, features = [
+    "derive",
+    "rc",
+] }
 anyhow = { version = "1.0.40", default-features = false }
 rand = { version = "0.8.4", default-features = false }
 sha2 = "0.10"

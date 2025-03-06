@@ -1,7 +1,4 @@
-use std::marker::PhantomData;
 use plonky2::field::extension::Extendable;
-use plonky2::hash::hash_types::RichField;
-use plonky2::{impl_gate_serializer, impl_generator_serializer, get_gate_tag_impl, read_gate_impl, get_generator_tag_impl, read_generator_impl};
 use plonky2::gates::arithmetic_base::ArithmeticGate;
 use plonky2::gates::arithmetic_extension::ArithmeticExtensionGate;
 use plonky2::gates::base_sum::BaseSumGate;
@@ -18,8 +15,14 @@ use plonky2::gates::public_input::PublicInputGate;
 use plonky2::gates::random_access::RandomAccessGate;
 use plonky2::gates::reducing::ReducingGate;
 use plonky2::gates::reducing_extension::ReducingExtensionGate;
+use plonky2::hash::hash_types::RichField;
 use plonky2::plonk::config::{AlgebraicHasher, GenericConfig};
 use plonky2::util::serialization::{GateSerializer, WitnessGeneratorSerializer};
+use plonky2::{
+    get_gate_tag_impl, get_generator_tag_impl, impl_gate_serializer, impl_generator_serializer,
+    read_gate_impl, read_generator_impl,
+};
+
 use plonky2_crypto::u32::gates::add_many_u32::{U32AddManyGate, U32AddManyGenerator};
 use plonky2_crypto::u32::gates::arithmetic_u32::{U32ArithmeticGate, U32ArithmeticGenerator};
 use plonky2_crypto::u32::gates::comparison::{ComparisonGate, ComparisonGenerator};
@@ -27,8 +30,18 @@ use plonky2_crypto::u32::gates::interleave_u32::{U32InterleaveGate, U32Interleav
 use plonky2_crypto::u32::gates::range_check_u32::{U32RangeCheckGate, U32RangeCheckGenerator};
 use plonky2_crypto::u32::gates::subtraction_u32::{U32SubtractionGate, U32SubtractionGenerator};
 use plonky2_crypto::u32::gates::uninterleave_to_b32::UninterleaveToB32Gate;
-use plonky2_crypto::u32::gates::uninterleave_to_u32::{UninterleaveToU32Gate, UninterleaveToU32Generator};
+use plonky2_crypto::u32::gates::uninterleave_to_u32::{
+    UninterleaveToU32Gate, UninterleaveToU32Generator,
+};
+use std::marker::PhantomData;
 // generators
+use crate::curve::curve_types::Curve;
+use crate::curve::ed25519::Ed25519;
+use crate::gadgets::curve::CurvePointDecompressionGenerator;
+use crate::gadgets::nonnative::{
+    NonNativeAdditionGenerator, NonNativeInverseGenerator, NonNativeMultiplicationGenerator,
+    NonNativeSubtractionGenerator,
+};
 use plonky2::gadgets::arithmetic::EqualityGenerator;
 use plonky2::gadgets::arithmetic_extension::QuotientGeneratorExtension;
 use plonky2::gadgets::range_check::LowHighGenerator;
@@ -52,10 +65,6 @@ use plonky2::iop::generator::{
 };
 use plonky2::recursion::dummy_circuit::DummyProofGenerator;
 use plonky2_crypto::biguint::BigUintDivRemGenerator;
-use crate::curve::curve_types::Curve;
-use crate::curve::ed25519::Ed25519;
-use crate::gadgets::curve::CurvePointDecompressionGenerator;
-use crate::gadgets::nonnative::{NonNativeAdditionGenerator, NonNativeInverseGenerator, NonNativeMultiplicationGenerator, NonNativeSubtractionGenerator};
 
 pub struct Ed25519GateSerializer;
 impl<F: RichField + Extendable<D>, const D: usize> GateSerializer<F, D> for Ed25519GateSerializer {
@@ -90,13 +99,13 @@ impl<F: RichField + Extendable<D>, const D: usize> GateSerializer<F, D> for Ed25
 }
 
 pub struct Ed25519GeneratorSerializer<C, const D: usize> {
-    pub _phantom: PhantomData<C>
+    pub _phantom: PhantomData<C>,
 }
 impl<F, C, const D: usize> WitnessGeneratorSerializer<F, D> for Ed25519GeneratorSerializer<C, D>
-    where
-        F: RichField + Extendable<D>,
-        C: GenericConfig<D, F = F> + 'static,
-        C::Hasher: AlgebraicHasher<F>,
+where
+    F: RichField + Extendable<D>,
+    C: GenericConfig<D, F = F> + 'static,
+    C::Hasher: AlgebraicHasher<F>,
 {
     impl_generator_serializer! {
         Ed25519GeneratorSerializer,
